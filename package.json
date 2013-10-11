@@ -20,7 +20,8 @@
     "mocha": "~1.1.0",
     "chai": "~1.0.3",
     "coffee-script":"*",
-    "underscore":"*"
+    "underscore":"*",
+    "jquery": "*"
   },
   "repository": {
     "type": "git",
