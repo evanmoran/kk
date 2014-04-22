@@ -5,7 +5,6 @@
   "description": "Type checking for JavaScript",
   "homepage": "http://kkjs.org",
   "keywords": [
-    "typo",
     "type",
     "checking",
     "javascript"
@@ -21,7 +20,7 @@
     "chai": "~1.0.3",
     "coffee-script":"*",
     "underscore":"*",
-    "jquery": "*"
+    "jsdom": "*"
   },
   "repository": {
     "type": "git",
