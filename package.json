@@ -1,0 +1,29 @@
+{
+  "name": "kk",
+  "version": "0.0.1",
+  "main": "kk.js",
+  "description": "Type checking for JavaScript",
+  "homepage": "http://kkjs.org",
+  "keywords": [
+    "type",
+    "checking",
+    "javascript"
+  ],
+  "author": "Evan Moran <evan@evanmoran.com>",
+  "dependencies": {
+  },
+  "scripts": {
+    "test": "cake test"
+  },
+  "devDependencies": {
+    "mocha": "~1.1.0",
+    "chai": "~1.0.3",
+    "coffee-script":"*",
+    "underscore":"*",
+    "jsdom": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/evanmoran/kk.git"
+  }
+}

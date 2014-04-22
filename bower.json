@@ -1,0 +1,35 @@
+{
+  "name": "kk",
+  "version": "0.0.1",
+  "main": "kk.js",
+  "homepage": "http://kkjs.org",
+  "authors": [
+    "Evan Moran <evan@evanmoran.com>"
+  ],
+  "description": "JavaScript type checking with attitude.",
+  "keywords": [
+    "kk",
+    "type",
+    "checking",
+    "attitude"
+  ],
+  "license": "MIT",
+  "ignore": [
+    ".DS_Store",
+    ".git",
+    ".gitignore",
+    ".gitmodules",
+    "Cakefile",
+    "MAKEFILE",
+    "lib",
+    "docs",
+    "generated",
+    "bower_components",
+    "modules",
+    "node_modules",
+    "package.json",
+    "test",
+    "versions",
+    "www"
+  ]
+}
