@@ -62,13 +62,16 @@ describe 'kk', ->
     expect(kk.isRegExp(/.*/)).to.equal true
     expect(kk.isRegExp(null)).to.equal false
 
-    # expect(kk.isObject({})).to.equal true
-    # expect(kk.isObject({a:1})).to.equal true
-    # expect(kk.isObject(undefined)).to.equal false
-    # expect(kk.isObject(null)).to.equal false
+    expect(kk.isObject({})).to.equal true
+    expect(kk.isObject([])).to.equal true
+    expect(kk.isObject(false)).to.equal false
+    expect(kk.isObject(42)).to.equal false
+    expect(kk.isObject("")).to.equal false
+    expect(kk.isObject(undefined)).to.equal false
+    expect(kk.isObject(null)).to.equal false
 
   it 'init', ->
-    expect(-> kk.init(5)).to.throw("kk.init expected two or more arguments")
+    expect(-> kk.init(5)).to.throw('kk.init expected two or more arguments')
     expect(kk.init(undefined, 5)).to.equal 5
     expect(kk.init(null, 5)).to.equal 5
     expect(kk.init({}, 5)).to.deep.equal {}
@@ -79,7 +82,6 @@ describe 'kk', ->
 
     # First value is preserved
     expect(kk.init({a:1},{a:2})).to.deep.equal {a:1}
-
 
     expect(kk.init(undefined, undefined)).to.equal null # not sure this is best, but documenting behavior
 
@@ -129,13 +131,13 @@ describe 'kk', ->
   it 'boolean', ->
     expect(-> kk(true, "boolean")).to.not.throw()
     expect(-> kk(false, "boolean")).to.not.throw()
-    expect(-> kk(null, "boolean")).to.throw("kk expected 'boolean' but found: null")
-    expect(-> kk(undefined, "boolean")).to.throw("kk expected 'boolean' but found: undefined")
-    expect(-> kk(0, "boolean")).to.throw("kk expected 'boolean' but found: 0")
-    expect(-> kk(1, "boolean")).to.throw("kk expected 'boolean' but found: 1")
-    expect(-> kk(3.14, "boolean")).to.throw("kk expected 'boolean' but found: 3.14")
-    expect(-> kk("false", "boolean")).to.throw("kk expected 'boolean' but found: \"false\"")
-    expect(-> kk(/false/, "boolean")).to.throw("kk expected 'boolean' but found: /false/")
+    expect(-> kk(null, "boolean")).to.throw('kk: "boolean" expected for value (null)')
+    expect(-> kk(undefined, "boolean")).to.throw('kk: "boolean" expected for value (undefined)')
+    expect(-> kk(0, "boolean")).to.throw('kk: "boolean" expected for value (0)')
+    expect(-> kk(1, "boolean")).to.throw('kk: "boolean" expected for value (1)')
+    expect(-> kk(3.14, "boolean")).to.throw('kk: "boolean" expected for value (3.14)')
+    expect(-> kk("false", "boolean")).to.throw('kk: "boolean" expected for value ("false")')
+    expect(-> kk(/false/, "boolean")).to.throw('kk: "boolean" expected for value (/false/)')
     expect(-> kk(Infinity, 'number')).to.not.throw()
     expect(-> kk(NaN, 'number')).to.not.throw()
 
@@ -146,41 +148,82 @@ describe 'kk', ->
     expect(-> kk(Infinity, "number")).to.not.throw()
     expect(-> kk(NaN, "number")).to.not.throw()
 
-    expect(-> kk(null, "number")).to.throw("kk expected 'number' but found: null")
-    expect(-> kk(undefined, "number")).to.throw("kk expected 'number' but found: undefined")
-    expect(-> kk(true, "number")).to.throw("kk expected 'number' but found: true")
-    expect(-> kk(false, "number")).to.throw("kk expected 'number' but found: false")
-    expect(-> kk(/1/, "number")).to.throw("kk expected 'number' but found: /1/")
-    expect(-> kk("1", "number")).to.throw("kk expected 'number' but found: \"1\"")
+    expect(-> kk(null, "number")).to.throw('kk: "number" expected for value (null)')
+    expect(-> kk(undefined, "number")).to.throw('kk: "number" expected for value (undefined)')
+    expect(-> kk(true, "number")).to.throw('kk: "number" expected for value (true)')
+    expect(-> kk(false, "number")).to.throw('kk: "number" expected for value (false)')
+    expect(-> kk(/1/, "number")).to.throw('kk: "number" expected for value (/1/)')
+    expect(-> kk("1", "number")).to.throw('kk: "number" expected for value ("1")')
 
   it 'string', ->
     expect(-> kk("test", "string")).to.not.throw()
     expect(-> kk("", "string")).to.not.throw()
     expect(-> kk("undefined", "string")).to.not.throw()
-    expect(-> kk(null, "string")).to.throw("kk expected 'string' but found: null")
-    expect(-> kk(undefined, "string")).to.throw("kk expected 'string' but found: undefined")
-    expect(-> kk(1, "string")).to.throw("kk expected 'string' but found: 1")
-    expect(-> kk(true, "string")).to.throw("kk expected 'string' but found: true")
-    expect(-> kk(/test/, "string")).to.throw("kk expected 'string' but found: /test/")
+    expect(-> kk(null, "string")).to.throw('kk: "string" expected for value (null)')
+    expect(-> kk(undefined, "string")).to.throw('kk: "string" expected for value (undefined)')
+    expect(-> kk(1, "string")).to.throw('kk: "string" expected for value (1)')
+    expect(-> kk(true, "string")).to.throw('kk: "string" expected for value (true)')
+    expect(-> kk(/test/, "string")).to.throw('kk: "string" expected for value (/test/)')
 
   it 'arrays', ->
-    a_numbers = [1,2,3]
-    a_one = ['one',2, /three/]
-
     expect(-> kk([], 'array')).to.not.throw()
     expect(-> kk([1,2,3], 'array')).to.not.throw()
-    expect(-> kk([1,2,3], 'string')).to.throw("kk expected 'string' for array[0] in: [1,2,3]")
+    expect(-> kk([1,2,3], 'string')).to.throw('kk: "string" expected for value ([1,2,3])')
     expect(-> kk([1,2,3], [])).to.not.throw()
-    # expect(-> kk([1,2,3], ['number'])).to.not.throw()
-    # expect(-> kk([1,2,3], ['number', 'number'])).to.not.throw()
-    # expect(-> kk([1,2,3], ['number', 'number', 'number'])).to.not.throw()
-    # expect(-> kk([1,2,3], ['number', 'number', 'number', 'number'])).to.throw("kk expected '[number,number,number,number] for array[0] in: [1,2,3]")
+    expect(-> kk(['one',2, /three/], 'array')).to.not.throw()
+    expect(-> kk(['one',2, /three/], [])).to.not.throw()
+    expect(-> kk([1,2,3], ['number'])).to.not.throw()
+    expect(-> kk([1,2,3], ['number', 'number'])).to.not.throw()
+    expect(-> kk([1,2,3], ['number', 'number', 'number'])).to.not.throw()
+    expect(-> kk([1,2,3], ['number', 'number', 'number', 'number']))
+      .to.throw('kk: "number" expected for fourth item (undefined) in: [1,2,3]')
 
-    # expect(-> kk(['one',2, /three/], 'array')).to.not.throw()
-    # expect(-> kk(['one',2, /three/], [])).to.not.throw()
+    expect(-> kk(["one","two","three"], ['string', 'string', 'number']))
+      .to.throw('kk: "number" expected for third item ("three") in: ["one","two","three"]')
 
-  it 'arguments'#, ->
-    # expect(-> kk("foobar", arguments, ["string", "string", "person"])
+  it 'deep arrays', ->
+    expect(-> kk([[[1],2],3], [[['number'], 'number'], 'number']))
+      .to.not.throw()
+
+    expect(-> kk([[[1],2],3], [[['string'], 'number'], 'number']))
+      .to.throw('ll')
+
+
+  it 'arguments', ->
+
+    # Set arguments to values of array
+    set = (args, array) ->
+      for arg,ix in array
+        args[ix] = array[ix]
+
+    expect(-> set(arguments, []); kk(arguments, 'array'))
+      .to.not.throw()
+
+    expect(-> set(arguments, [1,2,3]); kk(arguments, 'array'))
+      .to.not.throw()
+
+    expect(-> set(arguments, [1,2,3]); kk(arguments, 'string'))
+      .to.throw('kk: "string" expected for value ([1,2,3])')
+
+    expect(-> set(arguments, [1,2,3]); kk(arguments, []))
+      .to.not.throw()
+
+    expect(-> set(arguments, [1,2,3]); kk(arguments, ['number','number','number']))
+      .to.not.throw()
+
+    expect(-> set(arguments, [1,2,3]); kk(arguments, ['number','number','number','number']))
+      .to.throw('kk: "number" expected for fourth argument (undefined) of: [1,2,3]')
+
+    expect(-> set(arguments, [1,2,3]); kk(arguments, ['number','number','number','number']))
+      .to.throw('kk: "number" expected for fourth argument (undefined) of: [1,2,3]')
+
+
+  it 'deep arguments'#, ->
+    # expect(-> set(arguments, [["a","b"],2,3]); kk(arguments, [['string','string'],'number']))
+    #   .to.not.throw()
+
+    # expect(-> set(arguments, [["a","b"],2,3]); kk(arguments, [['number']]))
+    #   .to.throw('kk: "number" expected for arguments[0][0] ("a") of: [["a","b"],2,3]')
 
   # it 'jquery', ->
   #   expect(-> kk($(''), 'jquery')).to.not.throw()
@@ -190,12 +233,12 @@ describe 'kk', ->
 
   numberIsEven = (v) ->
     if v % 2
-      "expected value to be even but found: {v}"
+      "expected value to be even but found {v}"
     else
       null
 
   stringExists = (str) ->
-    if typeof str == "string" and str.length > 0 then SUCCESS else "kk expected 'string | .length > 0 but found: {str}"
+    if typeof str == "string" and str.length > 0 then SUCCESS else 'kk: "string" expected for value:length > 0 but found {str}'
 
   it 'validate with function'#, ->
     # expect(-> kk(2, numberIsEven)).to.not.throw()

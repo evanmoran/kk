@@ -16,10 +16,17 @@
     "test": "cake test"
   },
   "devDependencies": {
-    "mocha": "~1.1.0",
+    "mocha": "*",
     "chai": "~1.0.3",
     "coffee-script":"*",
     "underscore":"*",
+    "backbone":"*",
+    "oj-twitter-button":"*",
+    "oj-github-button":"*",
+    "oj-markdown":"*",
+    "backbone":"*",
+    "async":"*",
+    "uglify-js":"*",
     "jsdom": "*"
   },
   "repository": {
