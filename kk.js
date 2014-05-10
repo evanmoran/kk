@@ -9,10 +9,11 @@
 // Define library
 }(this, function(root){
   var ObjP = Object.prototype,
+  ArrP = Array.prototype,
 
   kk = function(value, type, options){
     var msg = kk.test(value, type, options)
-    kk.assert(!msg, msg);
+    kk.assert(!msg, msg)
   }
 
   kk.version = '0.0.1'
@@ -20,11 +21,11 @@
   kk.settings = {
     // Specify error message templates
     message: {
-      "default":  "{name} expected '{type}' but found: {value}",
-      "argument": "{name} expected '{type}' for argument[{index}] but found: {value}",
-      "object":   "{name} expected '{type}' for object[\"{key}\"] in: {value}",
-      "array":    "{name} expected '{type}' for array[{index}] in: {value}",
-      "function": "{name} expected different input but found: {value}"
+      "default":  "{name}: {type} expected for value ({value})",
+      "arguments": "{name}: {type} expected for {ordinal} argument ({value}) of: {parent}",
+      "array":    "{name}: {type} expected for {ordinal} item ({value}) in: {parent}",
+      "property": "{name}: {type} expected for {key} property ({value}) in: {parent}",
+      "method":   "{name}: {type} expected for {key} method ({value}) in: {parent}"
     }
   }
 
@@ -35,7 +36,9 @@
   kk.error = function(msg){throw new Error(msg)}
 
   // kk.is: outputs true if `value` matches `type`, false otherwise
-  kk.is = function(value, type, options) {return !kk.test(value, type, options)}
+  kk.is = function(value, type, options) {
+    return !kk.test(value, type, options)
+  }
 
   // Convert any value to a debug-friendly string
   kk.toString = function(value){
@@ -47,6 +50,8 @@
     else if(typeof value === "object") {
       if(kk.isArray(value))
         out = arrayToString(value)
+      else if(kk.isArguments(value))
+        out = arrayToString(toArray(value))
       else if (kk.isRegExp(value))
         out = value.toString()
       else if (kk.isDate(value))
@@ -73,7 +78,8 @@
   // kk.test: return undefined if `value` matches `type`, otherwise return the error message
   kk.test = function(value, type, options) {
     // default options to an object with known keys
-    options = kk.init(options, {name: 'kk', type: type, value: value})
+    options = kk.init(options, {
+      name: 'kk', type: type, value: value, path:""})
 
     var SUCCESS = null, i, expected, typeOfAny, key
 
@@ -93,7 +99,7 @@
 
       // array, regex, date, jquery, oj, object
       if (typeOfAny === 'object') {
-        if (kk.isArray(value))
+        if (kk.isArguments(value) || kk.isArray(value))
           return testArray(value, type, options)
         else if (kk.isRegExp(value))
           expected = 'regex'
@@ -111,10 +117,8 @@
     }
 
     // Succeed if expected matches type, otherwise output an error message
-    return expected === type ? SUCCESS : message('default', options)
+    return expected === type ? SUCCESS : message(options)
   }
-
-
 
   // Type detection functions
   kk.isJQuery = function(a){return !!(a && a.jquery)}
@@ -128,14 +132,14 @@
   kk.isUndefined = function(a){return a === void 0}
   kk.isNaN = function(a){return kk.isNumber(a) && a != +a}
   kk.isArray = Array.isArray || function(a){return ObjP.toString.call(a) == '[object Array]'}
+  kk.isObject = function(a){return a != null && typeof a === "object"}
+
   // isArguments, isFunction, isString, isNumber, isDate, isRegExp
-  function _create(name){
-    kk['is' + name] = function(a){
-      return ObjP.toString.call(a) == '[object ' + name + ']'
-    }
-  }
+  function _create(name){kk['is' + name] = function(a){
+    return ObjP.toString.call(a) == '[object ' + name + ']'}}
   var names = ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp']
-  for (var i = 0; i < names.length; i++) _create(names[i])
+  for (var i = 0; i < names.length; i++)
+    _create(names[i])
 
   // kk.format: substitute strings into `format` from `map`
   // Example: kk.format('Hello {name}', {name:'Evan'}) => "Hello Evan"
@@ -177,44 +181,46 @@
   // Test that `value` matches `type` when `value` is an object literal
   function testObject(value, type, options){
     var msg
+    options.object = value
     for (k in value) {
       options.key = k
       msg = kk.test(value[k], type[k])
       if(msg)
-        return message('object', options)
+        return message(options)
     }
     delete options.key
+    delete options.object
     return SUCCESS
   }
 
   // Test that `value` matches `type` when `value` is an Array
-  function testArray(value, type, options){
-    var SUCCESS = null, msg, i, messageType = 'array'
-    // [] is 'array'
-    console.log("value: ", value);
-    console.log("type: ", type);
-    console.log("value.length: ", value.length);
+  function testArray(value, type, map){
+    var SUCCESS = null, msg, i
 
+    // test([], 'array')
     if(type === 'array')
       return SUCCESS
 
-    // // [1] is not ['number','number']
-    // else if (value.length < type.length )
-    //   return message('default', options)
+    // test([],'number')
+    if(!kk.isArray(type))
+      return message(map)
 
-    // NYI: [1,2,3] is ['number...']
-
-    // Arguments array should be called out as special
-    if(kk.isArguments(value))
-      messageType = 'argument'
+    // NYI: test([1,2,3], ['number...'])
 
     // Recurse by index
+    map.parent = value
+
     for (i = 0; i < type.length; i++) {
-      options.index = i
-      if(!kk.is(value[i], type[i], options))
-        return message(messageType, options)
+      map.type = type[i]
+      map.value = value[i]
+      map.index = i
+      if(!kk.is(value[i], type[i], map))
+        return message(map)
     }
-    delete options.index
+    delete map.index
+    delete map.parent
+    map.type = type
+    map.value = value
     return SUCCESS
   }
 
@@ -253,12 +259,43 @@
     return str
   }
 
+  // createString expected "string" for property "believe" but found 3 in object {}
+  // createString expected first argument to be "string" but found undefined
+
+  kk.ordinal = 'first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth thirteenth fourteenth fifteenth sixteenth seventeenth eighteenth nineteenth twentieth'.split(' ')
+
   // Create output message for given `messageType` and variable `map`
-  function message(messageType, map){
+  function message(map){
+    kk.assert(map && typeof map == 'object', 'object expected')
+
     // Get message from map or settings
-    var msg = (map && map.message ? map.message : kk.settings.message[messageType])
+    var msg, messageType = "default", topLevel = false
+
+    // Detect type of message from parent, type, value
+    if(kk.isArguments(map.parent))
+      messageType = 'arguments'
+    else if(kk.isArray(map.parent))
+      messageType = 'array'
+    else if(kk.isObject(map.parent)) {
+      if(map.type === "function")
+        messageType = 'method'
+      else
+        messageType = 'property'
+    }
+
+    // Get message
+    msg = (map && map.message ? map.message : kk.settings.message[messageType])
+
+    // Convert to pretty strings
     if('value' in map)
       map.value = kk.toString(map.value)
+    if('type' in map)
+      map.type = kk.toString(map.type)
+    if('index' in map)
+      map.ordinal = kk.ordinal[map.index]
+    if('parent' in map)
+      map.parent = kk.toString(map.parent)
+
     return kk.format(msg, map)
   }
 
@@ -276,6 +313,14 @@
       out += comma + kk.toString(value[i])
     }
     return out += "]"
+  }
+
+  // Convert args to array
+  function toArray(args){
+    var out = [], k
+    for(k in args)
+      out.push(args[k])
+    return out
   }
 
   // {a:1,"b c":2}
