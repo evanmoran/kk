@@ -2,3 +2,7 @@
 	path = www
 	url = git@github.com:evanmoran/kk.git
 	branch = gh-pages
+[submodule "public"]
+	path = public
+	url = git@github.com:evanmoran/kk.git
+	branch = gh-pages
