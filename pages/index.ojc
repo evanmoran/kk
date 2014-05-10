@@ -1,0 +1,63 @@
+# index
+
+modules = require './modules/all.ojc'
+_ = require 'underscore'
+Backbone = require 'backbone'
+_template = require './_template'
+
+module.exports = ->
+
+  _template
+    title: 'An Static Website Using a Template'
+
+    scripts: [
+      'modules/all.js'
+      'lib/bootstrap/dist/js/bootstrap.js'
+    ]
+
+    styles: [
+      'lib/bootstrap/dist/css/bootstrap.css'
+      'lib/font-awesome/css/font-awesome.min.css'
+    ]
+
+    # Content is just called through
+    content: ->
+
+      # Create a Backbone UserModel and UserCollection
+      UserModel = Backbone.Model.extend()
+      UserCollection = Backbone.Collection.extend model:UserModel
+
+      # Create some users and put them in a collection
+      users = new UserCollection [
+        {name:'Evan', twitter:'evanmoran'},
+        {name:'James', twitter:'iamthelawton'},
+        {name:'Laura', twitter:'savinola'}
+      ]
+
+      h1 'An Static Website Using a Template'
+
+      p 'Render a table from a Backbone collection:'
+      Table
+        header: ['Button', 'Name', 'Username']
+        collection: users
+        each: (user, td) ->
+          # Render each row with the following:
+          td ->
+            TwitterButton user.get 'twitter'
+          td user.get 'name'
+          td user.get 'twitter'
+
+      # Add some CSS to make the table all pretty like
+      css
+        table:
+          borderCollapse: 'collapse'
+          borderSpacing: 0
+        th:
+          padding:'10px'
+          textAlign:'left'
+          borderBottom:'1px solid orange'
+        td:
+          borderBottom:'1px solid orange'
+          padding: '10px'
+        'td:first-child':
+          minWidth: '200px'

@@ -1,0 +1,31 @@
+# _templatePage
+
+module.exports = (data) ->
+
+  # Default initialize data to accept: title, scripts, styles, and content
+  if typeof data != 'object'
+    throw new Error '_templatePage: expect object for first argument'
+
+  data.title ?= ''
+  data.scripts ?= []
+  data.styles ?= []
+  data.content ?= ->
+
+  # Create the page's doctype, html, head, title, and body tags
+  doctype 5
+  html ->
+    head ->
+      # Define the title
+      title data.title
+
+      # Define the scripts
+      for scrpt in data.scripts
+        script src:scrpt, type:'text/javascript'
+
+      # Define the styles
+      for styl in data.styles
+        link href:styl, rel:"stylesheet", type:"text/css"
+
+    body ->
+      # Define content by calling through to a function passed in
+      data.content()

@@ -1,0 +1,9 @@
+{
+  "name": "kk-pages",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "bootstrap": "*",
+    "font-awesome": "*"
+  }
+}
