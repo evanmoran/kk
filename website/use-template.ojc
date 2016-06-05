@@ -1,24 +1,29 @@
-# index
+# use-template.ojc: Create a simple webpage that uses a template function
 
+# Require all modules at once so OJ can cache and minify this file separately
 modules = require './modules/all.ojc'
+
+# Otherwise just require like normal
 _ = require 'underscore'
 Backbone = require 'backbone'
-_template = require './_template'
 
+# Require the template function we are going to use
+# To allow it to be accessed client and server
+_templatePage = require './_templatePage'
+
+# Export your site returning an function that uses OJ:
 module.exports = ->
 
-  _template
+  # Use the template to create the <doctype>, <html>, <head>, and <body> tags for you.
+  _templatePage
     title: 'An Static Website Using a Template'
 
-    scripts: [
-      'modules/all.js'
-      'lib/bootstrap/dist/js/bootstrap.js'
-    ]
+    # Include script files here
+    # modules/all.js is the unified module file built by OJ
+    scripts: ['modules/all.js']
 
-    styles: [
-      'lib/bootstrap/dist/css/bootstrap.css'
-      'lib/font-awesome/css/font-awesome.min.css'
-    ]
+    # Include css files here
+    styles: []
 
     # Content is just called through
     content: ->

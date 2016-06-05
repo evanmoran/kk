@@ -1,36 +1,11 @@
 kk.js
 =======
 
-KK helps do simple type checking in JavaScript. This is not a perfect solution, nor can it be with JavaScripts weak type system. That said, it will help you write better code.
+`kk` helps you do type checking and error reporting in JavaScript. In an ideal world JavaScript would do this for us. Sadly, this is not to be. kk.js makes this manual approach much simpler!
 
-Check your arguments by name:
+Let's break it down. In its simplest form `kk` checks to see if a `value` matches a `type`:
 
-    function createPerson(name, count) {
-      kk(name, "string");
-      kk(count, "number");
-    }
-
-    createPerson(5, "Evan")
-      // Throws: "kk expected string but found: 5"
-
-Check your arguments by order:
-
-    function createPerson(name, count) {
-      kk(arguments, ["string", "number"])
-    }
-
-    createPerson("Evan", 5)
-      // Success (does nothing)
-
-    createPerson(5, "Evan")
-      // Throws: 'kk expected "string" for argument[0] but found: 5'
-
-    createPerson("Evan")
-      // Throws: "kk expected 2 arguments, ['string','number'], but found: ["Evan"]
-
-Let's break this down. `kk` checks to see if a `value` matches a `type`:
-
-    kk(value, type)            // Like so!
+    kk(value, type)            // Does the value match the type?
 
 Like an assert, when `kk` succeeds it does nothing:
 
@@ -50,7 +25,46 @@ When it fails it throws helpful messages:
 
     kk({a:1}, "array");        // Throws: "kk expected 'array' but found: {a:1}"
 
-`kk` understands the types that are built in:
+NYI -- Most importantly, `kk` is recursive. This means objects can typecheck by key:
+
+    var obj = {name:'Evan'};
+
+    kk(obj, "object");          // Success (simple check)
+
+    kk(obj, {name:'string'});   // Success (recursive check by key)
+
+    kk(obj, {age:'number'});    // Throws: "kk expected 'number' for object.age in: {name:'Evan'}"
+
+NYI -- And arrays can check by position:
+
+    var arr = [1,'two',/three/];
+
+    kk(arr, "array");       // Success (simple check)
+
+    kk(arr, "['number']")   // Success (positional check by index)
+
+    kk(arr, "['string']")   // Throws: "kk expected 'string' for array[0] in: [1,'two',/three/]"
+
+    kk(arr, "['number', 'string', 'regex']")   // Success (yup, they're all checked!)
+
+Arguments are like arrays but error messaging is even clearer!
+
+    function createPerson(name, count) {
+        kk(arguments, ['string', 'number']);
+    }
+
+In this example when you call `createPerson` with the wrong arguments a clear error message will be thrown:
+
+    createPerson("Evan", 5);
+      // Success (does nothing as both types match!)
+
+    createPerson(5, "Evan");
+      // Throws: 'kk expected "string" for argument[0] but found: 5'
+
+    createPerson("Evan");
+      // Throws: "kk expected 2 arguments, ['string','number'], but found: ["Evan"]
+
+`kk` understands the harder to detect built in types:
 
     kk(/.*/, "regex");
 
@@ -62,11 +76,43 @@ When it fails it throws helpful messages:
 
     kk($("body").get(), "element");
 
-`kk` understands the important things (pull requests welcome!):
+`kk` understands types that are common but hard to check for (pull requests welcome!):
 
     kk(3, "integer");               // Sweet, I always wanted this.
 
-    kk("evan@kkjs.org", "email");   // Yeah, sure, this uses regex but it's still useful!
+    kk("evan@kkjs.org", "email");   // Yeah, this uses regex, but it's still helpful!
+
+
+ we have to approach this manually, but This is a stop gap, and quite imperfect.
+
+JavaScript doesn't have type checking
+
+
+Type checking isn't built into JavaScript, but this  from we still must use types to make sure our code works correctly. It's a manual process, but this doesn't mean it should be painful. This is where kk.js steps in.
+
+
+
+
+### kk.js can verify the arguments of a function in a single line
+
+    function createPerson(name, count) {
+      kk(arguments, ["string", "number"]);
+    }
+
+These messages are customizable. But the defaults are intended to be very clear.
+
+### Alternatively you can check types recursively
+
+    function createPerson(name, count) {
+      kk(name, "string");
+      kk(count, "number");
+    }
+
+Which will throw an error like so!
+
+    createPerson(5, "Evan")
+      // Throws: "kk expected string but found: 5"
+
 
 NYI -- You can allow multiple types by with `or`:
 
@@ -85,28 +131,6 @@ NYI -- For convenience you can allow null or undefined with `?`:
     kk(undefined, "string?");   // Success
 
     kk(0, "string?");           // Throws: "kk expected 'string | null | undefined' but found: 0"
-
-NYI -- Most importantly, `kk` is recursive and understands objects and arrays. Check objects by key:
-
-    var obj = {name:'Evan'};
-
-    kk(obj, "object");          // Success (simple check)
-
-    kk(obj, {name:'string'});   // Success (recursive check by key)
-
-    kk(obj, {age:'number'});    // Throws: "kk expected 'number' for object.age in: {name:'Evan'}"
-
-NYI -- Check arrays by position:
-
-    var arr = [1,'two',/three/];
-
-    kk(arr, "array");       // Success (simple check)
-
-    kk(arr, "['number']")   // Success (positional check by index)
-
-    kk(arr, "['string']")   // Throws: "kk expected 'string' for array[0] in: [1,'two',/three/]"
-
-    kk(arr, "['number', 'string', 'regex']")   // Success (yup, they're all checked!)
 
 NYI -- Arrays can use `'...'` to glob similar types (pull requests welcome):
 
